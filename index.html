@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Litpax — Quotation Maker</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -20,207 +20,244 @@
   </div>
 </div>
 
-<!-- APP SHELL -->
-<div id="app" style="display:none">
+<!-- APP -->
+<div id="app" class="app-shell" style="display:none">
 
-  <!-- NAV (screen only) -->
+  <!-- TOP NAV -->
   <nav class="topnav no-print">
     <div class="topnav-l">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <rect x="3" y="1" width="14" height="18" rx="2" fill="#fbbf24"/>
-        <rect x="7" y="0" width="6" height="3" rx="1" fill="#fbbf24"/>
+      <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+        <rect x="3" y="1" width="14" height="18" rx="2" fill="#f59e0b"/>
+        <rect x="7" y="0" width="6" height="3" rx="1" fill="#f59e0b"/>
         <path d="M10 5L7 11H10.5L8.5 15.5L13.5 9H10Z" fill="#1e1b4b"/>
       </svg>
-      <span class="topnav-brand">Litpax Technology</span>
-      <span class="topnav-sep">/</span>
-      <span class="topnav-mod">Quotation Maker</span>
+      <span class="nb">Litpax Technology</span>
+      <span class="ns">/</span>
+      <span class="nm">Quotation Maker</span>
     </div>
     <div class="topnav-r">
-      <span id="navDate"></span>
-      <div id="navStatus" class="nav-pill">
-        <span class="pill-dot"></span>
+      <span id="navDate" class="nd"></span>
+      <div id="navPill" class="npill">
+        <span class="pdot"></span>
         <span id="navLbl">Loading</span>
       </div>
     </div>
   </nav>
 
-  <!-- DEMO BANNER -->
   <div id="demoBanner" class="demo-strip no-print" style="display:none">
-    ⚠ Demo mode — <code>script.js</code> line 3 pe GAS URL daalo
+    ⚠ Demo mode — <code>script.js</code> line 3 pe apna GAS URL daalo
   </div>
 
-  <!-- PAGE -->
-  <div class="page-wrap">
+  <!-- TWO-COLUMN LAYOUT -->
+  <div class="layout">
 
-    <!-- SETTINGS SIDEBAR (screen only) -->
+    <!-- LEFT SIDEBAR -->
     <aside class="sidebar no-print">
-      <div class="sb-section">
-        <p class="sb-head">Quote Settings</p>
-        <div class="field">
-          <label class="flabel">GST Rate</label>
-          <select class="finput" id="gstSelect" onchange="recalcTotals()">
-            <option value="0">0% — No GST</option>
-            <option value="5">5%</option>
-            <option value="12">12%</option>
-            <option value="18" selected>18%</option>
-            <option value="28">28%</option>
-          </select>
-        </div>
-        <div class="field mt10">
-          <label class="flabel">Valid For</label>
-          <div class="unit-row">
-            <input class="finput" type="number" id="validityDays" value="30" min="1" oninput="updateValidTill()"/>
-            <span class="unit-lbl">days</span>
-          </div>
-        </div>
+
+      <div class="sb-card">
+        <p class="sb-ttl">Actions</p>
+        <button class="sbtn sbtn-primary" id="saveBtn" onclick="saveQuotation()">💾 Save Quotation</button>
+        <button class="sbtn sbtn-outline mt8" onclick="previewPrint()">🖨 Print / PDF</button>
+        <button class="sbtn sbtn-ghost mt8" onclick="resetForm()">↺ Reset</button>
       </div>
 
-      <div class="sb-section">
-        <p class="sb-head">Actions</p>
-        <button class="sb-btn sb-btn-primary" onclick="saveQuotation()" id="saveBtn">💾 Save Quotation</button>
-        <button class="sb-btn sb-btn-secondary mt8" onclick="previewPrint()">🖨 Print / PDF</button>
-        <button class="sb-btn sb-btn-ghost mt8" onclick="resetForm()">↺ Reset Form</button>
+      <div class="sb-card">
+        <p class="sb-ttl">Summary</p>
+        <div class="srow"><span>Battery Subtotal</span><span id="sbBatt">₹0.00</span></div>
+        <div class="srow"><span>Battery GST (18%)</span><span id="sbBattGst">₹0.00</span></div>
+        <div class="srow mt4"><span>Charger Subtotal</span><span id="sbChar">₹0.00</span></div>
+        <div class="srow"><span>Charger GST (5%)</span><span id="sbCharGst">₹0.00</span></div>
+        <div class="srow grand-row"><span>Grand Total</span><span id="sbGrand">₹0.00</span></div>
       </div>
 
-      <div class="sb-section sb-totals-preview">
-        <p class="sb-head">Summary</p>
-        <div class="sb-total-row"><span>Subtotal</span><span id="sbSubtotal">₹0.00</span></div>
-        <div class="sb-total-row"><span id="sbGstLabel">GST (18%)</span><span id="sbGst">₹0.00</span></div>
-        <div class="sb-total-row sb-grand"><span>Total</span><span id="sbGrand">₹0.00</span></div>
-      </div>
     </aside>
 
     <!-- QUOTATION DOCUMENT -->
-    <div class="doc-wrap">
-      <div class="doc" id="quoteDoc">
+    <div class="doc-area">
+    <div class="doc" id="quoteDoc">
 
-        <!-- ══ HEADER BAND ══ -->
-        <div class="doc-header">
-          <div class="dh-left">
-            <div class="dh-logo-wrap">
-              <svg width="36" height="36" viewBox="0 0 20 20" fill="none">
-                <rect x="3" y="1" width="14" height="18" rx="2" fill="#fbbf24"/>
-                <rect x="7" y="0" width="6" height="3" rx="1" fill="#fbbf24"/>
-                <path d="M10 5L7 11H10.5L8.5 15.5L13.5 9H10Z" fill="#1e1b4b"/>
-              </svg>
-            </div>
-            <div>
-              <div id="hCompanyName" class="dh-company">Litpax Technology Pvt. Ltd.</div>
-              <div id="hCompanyContact" class="dh-contact"></div>
-            </div>
+      <!-- ══ COMPANY HEADER ══ -->
+      <div class="dh">
+        <div class="dh-l">
+          <div class="dh-logo">
+            <svg width="34" height="34" viewBox="0 0 20 20" fill="none">
+              <rect x="3" y="1" width="14" height="18" rx="2" fill="#f59e0b"/>
+              <rect x="7" y="0" width="6" height="3" rx="1" fill="#f59e0b"/>
+              <path d="M10 5L7 11H10.5L8.5 15.5L13.5 9H10Z" fill="#1e1b4b"/>
+            </svg>
           </div>
-          <div class="dh-right">
-            <div id="hPhone" class="dh-detail"><span class="dh-icon">📞</span><span id="hPhoneVal"></span></div>
-            <div id="hEmail" class="dh-detail"><span class="dh-icon">✉</span><span id="hEmailVal"></span></div>
-            <div id="hAddress" class="dh-detail"><span class="dh-icon">📍</span><span id="hAddressVal"></span></div>
+          <div>
+            <div id="hName" class="dh-name">Litpax Technology Pvt. Ltd.</div>
+            <div id="hSub" class="dh-sub"></div>
           </div>
         </div>
-        <div class="doc-header-accent"></div>
+        <div class="dh-r">
+          <div class="dh-ci"><span>📞</span><span id="hPhone"></span></div>
+          <div class="dh-ci"><span>✉</span><span id="hEmail"></span></div>
+          <div class="dh-ci"><span>📍</span><span id="hAddr"></span></div>
+        </div>
+      </div>
+      <div class="dh-bar"></div>
 
-        <!-- ══ QUOTATION TITLE ROW ══ -->
-        <div class="doc-title-row">
-          <div class="dt-left">
-            <p class="dt-to-label">Quotation To</p>
-            <!-- CUSTOMER FIELDS (editable on screen, static on print) -->
-            <input class="finput cust-name-input" type="text" id="custName" placeholder="Customer / Company Name *"/>
-            <div class="cust-sub-fields">
-              <input class="finput cust-sub" type="tel"   id="custPhone"   placeholder="Ph: +91 XXXXX XXXXX"/>
-              <input class="finput cust-sub" type="email" id="custEmail"   placeholder="Email"/>
-              <input class="finput cust-sub" type="text"  id="custAddress" placeholder="Address, City"/>
-              <input class="finput cust-sub mono" type="text" id="custGST" placeholder="GST: 22XXXXX1234X1ZX"/>
-            </div>
-          </div>
-
-          <div class="dt-center">
-            <div class="dt-heading">QUOTATION</div>
-          </div>
-
-          <div class="dt-right">
-            <table class="dt-meta">
-              <tr><td class="dm-key">Quotation No</td><td class="dm-val" id="docQNo">Auto</td></tr>
-              <tr><td class="dm-key">Date</td><td class="dm-val" id="docDate">—</td></tr>
-              <tr><td class="dm-key">Valid Till</td><td class="dm-val" id="docValidTill">—</td></tr>
-            </table>
-          </div>
+      <!-- ══ QUOTATION TITLE + CUSTOMER + META ══ -->
+      <div class="qt-band">
+        <!-- Customer -->
+        <div class="qt-cust">
+          <div class="qt-label">Quotation To</div>
+          <input class="cn-input" type="text" id="custName" placeholder="Customer / Company Name *"/>
+          <input class="cs-input" type="tel"   id="custPhone"   placeholder="Ph: +91 XXXXX XXXXX"/>
+          <input class="cs-input" type="email" id="custEmail"   placeholder="Email"/>
+          <input class="cs-input" type="text"  id="custAddress" placeholder="Address, City"/>
+          <input class="cs-input mono" type="text" id="custGST" placeholder="GST Number"/>
         </div>
 
-        <!-- ══ ITEMS TABLE ══ -->
-        <div class="doc-items">
+        <!-- BIG TITLE -->
+        <div class="qt-title">QUOTATION</div>
 
-          <!-- Screen header -->
-          <div class="items-hdr no-print">
-            <div class="ih-desc">Product Description</div>
-            <div class="ih-cap">Capacity</div>
-            <div class="ih-volt">Voltage</div>
-            <div class="ih-mode">Rate Mode</div>
-            <div class="ih-qty">QTY</div>
-            <div class="ih-rate">Rate (₹)</div>
-            <div class="ih-total">Total</div>
-            <div class="ih-del"></div>
-          </div>
-
-          <!-- Print header -->
-          <div class="print-hdr">
-            <div class="ph-desc">Product Description</div>
-            <div class="ph-cap">Capacity</div>
-            <div class="ph-volt">Voltage</div>
-            <div class="ph-qty">QTY</div>
-            <div class="ph-rate">Rate (₹)</div>
-            <div class="ph-total">Total (₹)</div>
-          </div>
-
-          <!-- Rows -->
-          <div id="itemsList" class="items-list"></div>
-          <div id="printList" class="print-list"></div>
-
-          <!-- Empty -->
-          <div id="emptyState" class="empty-st no-print" style="display:none">
-            No items yet — <button class="btn-link" onclick="addItem()">add first item</button>
-          </div>
-
-          <!-- Add button -->
-          <button class="btn-add-row no-print" onclick="addItem()">+ Add Item</button>
-
-          <!-- Totals block -->
-          <div class="totals-block">
-            <div class="totals-left no-print">
-              <label class="flabel">Terms & Conditions</label>
-              <textarea class="finput" id="notes" rows="5"
-                placeholder="• Payment: 50% advance, 50% before dispatch&#10;• Delivery: 15–20 working days&#10;• Warranty: 2 years on manufacturing defects"></textarea>
-            </div>
-            <div class="totals-right">
-              <div class="tr-row"><span>Subtotal</span><span id="subtotalVal">₹0.00</span></div>
-              <div class="tr-row"><span>GST <em id="gstPctLbl">(18%)</em></span><span id="gstVal">₹0.00</span></div>
-              <div class="tr-grand">
-                <div class="trg-inner">
-                  <span>GRAND TOTAL</span>
-                  <span id="grandTotalVal">₹0.00</span>
+        <!-- Meta -->
+        <div class="qt-meta">
+          <table class="mt-tbl">
+            <tr><td class="mk">Quotation No</td><td class="mv" id="docQNo">Auto</td></tr>
+            <tr><td class="mk">Date</td><td class="mv" id="docDate">—</td></tr>
+            <tr><td class="mk">Valid Till</td><td class="mv" id="docValidTill">—</td></tr>
+            <tr><td class="mk">Valid For</td>
+              <td class="mv">
+                <div class="vf-row">
+                  <input class="vf-inp" type="number" id="validityDays" value="30" min="1" oninput="updateValidTill()"/>
+                  <span class="vf-unit">days</span>
                 </div>
-              </div>
-              <div class="tr-words print-only" id="amountWords">Zero Rupees Only</div>
-            </div>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ BATTERY SECTION ══ -->
+      <div class="sec-wrap">
+        <div class="sec-head">
+          <div class="sh-left">
+            <div class="sh-dot batt-dot"></div>
+            <span class="sh-title">Battery Items</span>
+            <span class="sh-gst">GST: 18%</span>
           </div>
+          <button class="btn-add no-print" onclick="addBattRow()">+ Add Battery</button>
         </div>
 
-        <!-- ══ FOOTER ══ -->
-        <div class="doc-footer">
-          <div class="df-left">
-            <div class="df-thanks">THANK YOU</div>
-            <div class="df-sub">FOR YOUR BUSINESS</div>
-            <div class="df-terms print-only" id="printTerms"></div>
-            <div class="df-bank print-only" id="printBank"></div>
-          </div>
-          <div class="df-right">
-            <div class="df-sig-space"></div>
-            <div class="df-sig-name" id="sigName">Authorised Signatory</div>
-            <div class="df-sig-co" id="sigCo"></div>
-          </div>
+        <!-- Items header -->
+        <div class="tbl-head no-print">
+          <div class="th-cat">Category</div>
+          <div class="th-mdl">Model</div>
+          <div class="th-cap">Capacity</div>
+          <div class="th-vlt">Voltage</div>
+          <div class="th-mode">Rate Mode</div>
+          <div class="th-qty">Qty</div>
+          <div class="th-rate">Rate (₹)</div>
+          <div class="th-amt">Total</div>
+          <div></div>
         </div>
-        <div class="doc-footer-accent"></div>
 
-      </div><!-- /doc -->
-    </div><!-- /doc-wrap -->
-  </div><!-- /page-wrap -->
+        <!-- Print header batteries -->
+        <div class="ptbl-head batt-ph">
+          <div>#</div><div>Category / Model</div><div>Capacity</div>
+          <div>Voltage</div><div>Qty</div><div>Rate (₹)</div><div>Total (₹)</div>
+        </div>
+
+        <div id="battList" class="item-list"></div>
+        <div id="printBattList" class="print-list"></div>
+        <div id="battEmpty" class="empty-st no-print" style="display:none">
+          No battery items — <button class="btn-lnk" onclick="addBattRow()">add one</button>
+        </div>
+        <button class="btn-add-row no-print" onclick="addBattRow()">+ Add Battery Item</button>
+
+        <!-- Battery Subtotal -->
+        <div class="sec-subtotal">
+          <span>Battery Subtotal</span><span id="battSubtotal">₹0.00</span>
+          <span>+ GST 18%</span><span id="battGst">₹0.00</span>
+          <span class="sec-sub-ttl">Battery Total</span><span id="battTotal" class="sec-sub-amt">₹0.00</span>
+        </div>
+      </div>
+
+      <!-- ══ CHARGER SECTION ══ -->
+      <div class="sec-wrap sec-charger">
+        <div class="sec-head">
+          <div class="sh-left">
+            <div class="sh-dot char-dot"></div>
+            <span class="sh-title">Charger Items</span>
+            <span class="sh-gst">GST: 5%</span>
+          </div>
+          <button class="btn-add no-print" onclick="addCharRow()">+ Add Charger</button>
+        </div>
+
+        <!-- Charger table header -->
+        <div class="tbl-head no-print">
+          <div class="th-mdl" style="grid-column:1/3">Charger Model</div>
+          <div class="th-cap">Compatibility</div>
+          <div class="th-vlt">Output</div>
+          <div class="th-mode">Unit</div>
+          <div class="th-qty">Qty</div>
+          <div class="th-rate">Rate (₹)</div>
+          <div class="th-amt">Total</div>
+          <div></div>
+        </div>
+
+        <!-- Print header chargers -->
+        <div class="ptbl-head char-ph">
+          <div>#</div><div>Charger Model</div><div>Compatibility</div>
+          <div>Output</div><div>Qty</div><div>Rate (₹)</div><div>Total (₹)</div>
+        </div>
+
+        <div id="charList" class="item-list"></div>
+        <div id="printCharList" class="print-list"></div>
+        <div id="charEmpty" class="empty-st no-print" style="display:none">
+          No charger items — <button class="btn-lnk" onclick="addCharRow()">add one</button>
+        </div>
+        <button class="btn-add-row no-print" onclick="addCharRow()">+ Add Charger Item</button>
+
+        <!-- Charger Subtotal -->
+        <div class="sec-subtotal">
+          <span>Charger Subtotal</span><span id="charSubtotal">₹0.00</span>
+          <span>+ GST 5%</span><span id="charGst">₹0.00</span>
+          <span class="sec-sub-ttl">Charger Total</span><span id="charTotal" class="sec-sub-amt">₹0.00</span>
+        </div>
+      </div>
+
+      <!-- ══ GRAND TOTAL BLOCK ══ -->
+      <div class="grand-block">
+        <div class="grand-left no-print">
+          <label class="flabel">Terms &amp; Conditions</label>
+          <textarea class="finput tc-area" id="notes" rows="4"
+            placeholder="• Payment: 50% advance, 50% before dispatch&#10;• Delivery: 15–20 working days&#10;• Warranty: 2 years on manufacturing defects"></textarea>
+        </div>
+        <div class="grand-right">
+          <div class="gr-row"><span>Battery Total</span><span id="gtBatt">₹0.00</span></div>
+          <div class="gr-row"><span>Charger Total</span><span id="gtChar">₹0.00</span></div>
+          <div class="gr-banner">
+            <span>GRAND TOTAL</span>
+            <span id="grandTotal" class="gt-amt">₹0.00</span>
+            <div class="gt-arrow"></div>
+          </div>
+          <div class="gr-words print-only" id="amountWords">Zero Rupees Only</div>
+        </div>
+      </div>
+
+      <!-- ══ DOC FOOTER ══ -->
+      <div class="doc-footer">
+        <div class="df-l">
+          <div class="df-thanks">THANK YOU<br><span>FOR YOUR BUSINESS</span></div>
+          <div class="df-terms print-only" id="printTerms"></div>
+          <div class="df-bank print-only" id="printBank"></div>
+        </div>
+        <div class="df-r">
+          <div class="sig-line"></div>
+          <div class="sig-name">Authorised Signatory</div>
+          <div class="sig-co" id="sigCo"></div>
+        </div>
+      </div>
+      <div class="doc-foot-bar"></div>
+
+    </div><!-- /doc -->
+    </div><!-- /doc-area -->
+  </div><!-- /layout -->
 </div><!-- /app -->
 
 <script src="script.js"></script>
