@@ -4,7 +4,7 @@
 // ══════════════════════════════════════════════
 
 // 🔴 Apna GAS URL yahan daalo
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxV1VaKAuoJc0Jpgb1fPbj6ICJ6Qqn8d1i2v5JDvdT3Z-VoDawl3-Kd6ORbk0A6h9OwyQ/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxVHtJ0sVhNSwb4aI0LHDOEa-MKmWptOhbdycvPK2I-dm2MYJxb0z7yydZQexAem0LpOA/exec';
 
 const BATT_GST = 18;
 const CHAR_GST = 5;
@@ -33,9 +33,11 @@ function loadGAS() {
   fetch(`${GAS_URL}?action=getConfig`)
     .then(r => r.json()).then(d => {
       if (!d.success) throw new Error(d.message);
-      battProducts = d.products.filter(p => p.type === 'battery');
-      charProducts = d.products.filter(p => p.type === 'charger');
-      company = d.company;
+      battProducts = (d.products || []).filter(p => p.type === 'battery');
+      charProducts  = (d.products || []).filter(p => p.type === 'charger');
+      company = d.company || {};
+      console.log('Battery products loaded:', battProducts.length);
+      console.log('Charger products loaded:', charProducts.length);
       applyCompany(); hideLoader(); setStatus('live','Live');
       addBattRow();
     }).catch(e => {
